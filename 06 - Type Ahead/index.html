@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Type Ahead 👀</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <form class="search-form">
+      <input type="text" class="search" placeholder="City or State" />
+      <ul class="suggestions">
+        <li>Filter for a city</li>
+        <li>or a state</li>
+      </ul>
+    </form>
+    <script>
+      const endpoint =
+        "https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb29/raw/2bf258763cdddd704f8ffd3ea9a3e81d25e2c6f6/cities.json";
+
+      const cities = [];
+
+      // Make API Call to retrieve Cities Data
+
+      fetch(endpoint)
+        .then((prom) => prom.json())
+        .then((data) => cities.push(...data))
+        .catch((error) =>
+          console.log(`Error during fetch,Please retry ${error}`)
+        );
+
+      // Function to filter match based on search text
+      function filterMatch(textToSearch, cities) {
+        return cities.filter((place) => {
+          const regex = new RegExp(textToSearch, "gi");
+          return place.city.match(regex) || place.state.match(regex);
+        });
+      }
+
+      // Function to format Numbers
+      function numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      }
+
+      // Render result
+
+      function displayMatch() {
+
+        const matchingData = filterMatch(this.value, cities);
+        let html;
+
+        if (matchingData.length !== 0 && this.value !== "") {
+          html = matchingData
+            .map((data) => {
+              // Highlight text under search
+              const regex = new RegExp(this.value, "gi");
+              const cityName = data.city.replace(
+                regex,
+                `<span class="hl">${this.value}</span>`
+              );
+              const stateName = data.state.replace(
+                regex,
+                `<span class="hl">${data.city}</span>`
+              );
+
+              return `
+              <li>  
+                  <span class="name">${cityName},${stateName}</span>
+                  <span class="population">${numberWithCommas(
+                    data.population
+                  )}</span> 
+              </li>
+              `;
+            })
+            .join("");
+        } else if (matchingData.length === 0) {
+          html = `
+          <li>
+          <span class="no-data">No matching data for ${this.value}</span>
+          </li>
+          `;
+        } else {
+          html = `
+          <li>Filter for a city</li>
+          <li>or a state</li>
+          `;
+        }
+
+        suggestions.innerHTML = html;
+      }
+
+      // Add Event Listner
+
+      const searchData = document.querySelector(".search");
+      const suggestions = document.querySelector(".suggestions");
+
+      searchData.addEventListener("change", displayMatch);
+      searchData.addEventListener("keyup", displayMatch);
+    </script>
+  </body>
+</html>
