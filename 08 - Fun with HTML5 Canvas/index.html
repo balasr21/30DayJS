@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>HTML5 Canvas</title>
+  </head>
+  <body>
+    <h1>Start Drawing!!</h1>
+    <h3>Press 'ESC' Key to clear screen</h3>
+    <canvas id="draw" width="800" height="800"></canvas>
+    <script>
+      const canvasEl = document.querySelector("#draw");
+
+      const context = canvasEl.getContext("2d");
+      let isDrawing = false;
+
+      context.width = window.innerWidth;
+      context.height = window.innerHeight;
+
+      context.strokeStyle = "#BADA55";
+      context.lineJoin = "round";
+      context.lineCap = "round";
+      context.lineWidth = 10;
+      let lastX = 0;
+      let lastY = 0;
+      let hue = 0;
+      let count = 0;
+
+      function draw(e) {
+        if (!isDrawing) return;
+
+        context.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+
+        context.beginPath();
+        // Starting Position
+        context.moveTo(lastX, lastY);
+        // Ending Position
+        context.lineTo(e.clientX, e.clientY);
+        // Draw
+        context.stroke();
+
+        // Update lastX , lastY so that it doesnt start always from 0,0
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+
+        hue++; // Increment for every draw to change color
+        if (hue >= 360) {
+          hue = 0;
+        }
+
+        context.lineWidth++;
+        if (context.lineWidth >= 100) {
+          context.lineWidth = 1;
+        }
+      }
+
+      function clearCanvas(e) {
+        console.log(e);
+        if ((e.key = "Escape")) {
+          context.clearRect(0, 0, canvasEl.width, canvasEl.height);
+        }
+      }
+
+      canvasEl.addEventListener("mousedown", (e) => {
+        isDrawing = true;
+        // Reset position to current co-ordinates to start the drawing position correctly
+        lastX = e.clientX;
+        lastY = e.clientY;
+      });
+
+      window.addEventListener("mousemove", draw);
+      window.addEventListener("mouseup", () => (isDrawing = false));
+      window.addEventListener("mouseout", () => (isDrawing = false));
+      window.addEventListener("keydown", clearCanvas);
+    </script>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+      }
+      h1,
+      h3 {
+        margin: 0 auto;
+        justify-content: center;
+        text-align: center;
+      }
+    </style>
+  </body>
+</html>
