@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Key Detection</title>
+    <script
+      type="text/javascript"
+      src="https://www.cornify.com/js/cornify.js"
+    ></script>
+  </head>
+  <body>
+    <script>
+      window.addEventListener("keyup", check);
+
+      const keysPressed = [];
+      const secretCode = "bala";
+
+      function check(e) {
+        keysPressed.push(e.key);
+        keysPressed.splice(
+          -secretCode.length - 1,
+          keysPressed.length - secretCode.length
+        );
+        if (keysPressed.join("").includes(secretCode)) {
+          cornify_add();
+        }
+      }
+    </script>
+  </body>
+</html>
